@@ -1,5 +1,5 @@
 # Phone spectrometer for public outreach
-
+   [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23400260.svg)](https://doi.org/10.5281/zenodo.23400260)
 MATLAB code that turns smartphone photos of a prism or grating rainbow into
 absorption spectra of coloured solutions. Developed for a Researchers' Night
 light-and-colour station, where visitors watch a sample remove colours from the
