@@ -1,0 +1,81 @@
+PHONE SPECTROMETER - VERSION AS USED FOR THE 2026 ANALYSIS (v1)
+===============================================================
+
+These are the scripts exactly as used to produce the figures in the article.
+They are kept unchanged for reproducibility. For new work, the user-friendly
+version in ../v2_user_friendly is recommended.
+
+Requirements: MATLAB R2020b or newer. No toolboxes.
+
+Files
+-----
+  uvvis/process_uv.m              lab UV-Vis: baseline correction + normalisation
+  spectrometer/run_spectra.m      phone photos -> absorbance spectra (settings in
+                                  the code, no clicks) - used for the article
+  spectrometer/overlay_phone_uv.m overlays phone spectra on UV-Vis spectra with an
+                                  approximate (prism model) wavelength axis
+  spectrometer/spectrumStation.m  live window for an event (watches a folder)
+  spectrometer/phone_spectrum.m   earlier single-run version (click to select strip)
+
+All scripts look for their input files in the CURRENT MATLAB FOLDER.
+
+1) Lab UV-Vis spectra - process_uv.m
+------------------------------------
+  Copy process_uv.m into ../example_data/uvvis (or copy sample1.csv ...
+  sample5.csv next to the script), cd there and type
+      process_uv
+  Input  : sample1.csv ... sample5.csv (UTF-8 text: wavelength, absorbance, sd)
+  Steps  : crop 380-800 nm; replace +/-2 nm around 486 and 656 nm (D2-lamp
+           lines) by a local quadratic fit; subtract mean A at 750-800 nm;
+           normalise to the maximum.
+  Output : UVVis_processed.csv, UVVis_processed.png; lambda_max printed.
+  Note   : the original instrument files are UTF-16; UTF-8 copies are in
+           example_data/uvvis, originals in raw_instrument_files.
+
+2) Phone spectra - run_spectra.m (used for the article)
+-------------------------------------------------------
+  The script expects these names in the current folder (the names used on
+  the analysis computer). With the example data, either rename copies or
+  edit the SETTINGS block:
+      full.jpg     = example_data/photos/01_reference_white.jpg
+      sample1.jpg  = 02_sample1_a.jpg
+      sample2.jpg  = 04_sample2.jpg
+      sample3.jpg  = 05_sample3.jpg
+      sample4.jpg  = 06_sample4.jpg
+      sample5.jpg  = 07_sample5.jpg
+  Type   run_spectra
+  It finds the rainbow, aligns photos on the blue spot, computes
+  A = -log10(I_sample / I_ref), removes a straight-line baseline in windows
+  where each sample is transparent (baseWin; needed because the photos used
+  automatic exposure), and saves phone_spectra.csv + PNG figures.
+  Settings used for the article: darkFile = '', smoothPx = 5,
+  minRefFrac = 0.3, baselineMode = 'windows', alignOnBlue = true.
+
+3) Overlay - overlay_phone_uv.m
+-------------------------------
+  Needs phone_spectra.csv (step 2) and UVVis_processed.csv (step 1) in the
+  current folder. Type  overlay_phone_uv
+  The phone wavelength axis is APPROXIMATE: a prism model
+  pixel = a + b / lambda^2 fitted to the phone peaks of samples 1, 3, 4, 5
+  against their lab lambda_max. Sample 2 is not used and is an independent
+  check. Output: Fig_phone_vs_UVVis_overlay.png, phone_wavelength_axis.csv.
+
+4) Live station - spectrumStation.m
+-----------------------------------
+  Type  spectrumStation  and follow the numbered buttons: choose the folder
+  where photos arrive, set dark (optional) and reference, select the strip,
+  calibrate (optional), tick auto-process. Each new photo becomes a spectrum.
+
+5) phone_spectrum.m
+-------------------
+  Earlier version: photo names in the code, you click two corners of the
+  strip. Kept for completeness.
+
+Known limitations of v1
+-----------------------
+  - File names are hard-coded; the phone must be in landscape with blue on
+    the left of the rainbow.
+  - Baseline windows (baseWin) are sample-specific and chosen from the lab
+    spectra.
+  - No check of camera exposure settings between photos.
+These are addressed in v2_user_friendly.
