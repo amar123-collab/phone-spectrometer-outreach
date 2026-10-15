@@ -1,0 +1,136 @@
+PHONE SPECTROMETER - USER-FRIENDLY VERSION (v2)
+================================================
+
+What it does
+------------
+Turns smartphone photos of a rainbow (white light split by a prism or a
+diffraction grating and projected onto a paper screen) into absorption
+spectra of coloured solutions placed in the light beam:
+
+    A = -log10( I_sample / I_reference )
+
+Requirements: MATLAB R2020b or newer. No toolboxes.
+
+Files
+-----
+  PhoneSpectrometer.m   point-and-click app (recommended)
+  batch_example.m       the same analysis as a script: edit settings, press Run
+  uvvis_process.m       baseline-correct and normalise lab UV-Vis spectra
+  core/                 the calculation functions (used by all three)
+  HOW_TO_USE.txt        this file
+
+Quick start (5 minutes, with the example photos)
+------------------------------------------------
+  1. In MATLAB, go to the folder v2_user_friendly and type
+         PhoneSpectrometer
+  2. "Choose photo folder..." -> select  example_data/photos
+  3. Click 01_reference_white.jpg in the list -> "Selected = REFERENCE".
+     A white box appears on the rainbow (found automatically).
+  4. Choose "Auto offset (auto-exposure photos)" in step 5
+     (the example photos were taken with automatic exposure).
+  5. Select 02_sample1_a.jpg, 04_sample2.jpg, 05_sample3.jpg, 06_sample4.jpg
+     and 07_sample5.jpg (Ctrl-click) -> "Measure selected photo(s)".
+     The absorbance spectra and a peak table appear.
+  6. "Save results..." writes a CSV, two PNG figures and a log of all
+     settings (for the Methods section).
+
+Without a laser calibration the x-axis is "position along the rainbow"
+(pixels, blue on the left, red on the right). That is enough to see where
+each sample absorbs.
+
+The steps in the app
+--------------------
+1. PHOTOS
+   Choose the folder where the photos are. Tick "Watch folder" at an event:
+   photos copied in from the phone (cloud sync, USB, Wi-Fi transfer app)
+   appear in the list automatically.
+
+2. REFERENCE AND DARK
+   Reference = photo with no sample (or a cuvette with solvent only).
+   Dark (optional) = photo with the lamp blocked, SAME camera settings.
+   The app refuses a "dark" photo that is brighter than the reference
+   background (usually room light was on).
+
+3. RAINBOW STRIP
+   Found automatically when the reference is set. If the white box is not
+   on the rainbow, use "Draw by hand..." and click two corners of a thin
+   box along the middle of the rainbow.
+   "Follow small phone movements" lines every photo up on its blue end, so
+   a bumped phone or screen does not ruin the measurement.
+   Vertical rainbows and rainbows with red on the left are handled
+   automatically; spectra always run blue -> red.
+
+4. WAVELENGTH AXIS (optional)
+   Laser calibration (recommended): shine two or more laser pointers of known
+   wavelength (e.g. 405, 532, 650 nm) along the beam path so their spots land
+   on the screen, photograph them, select that photo and press
+   "Calibrate: selected laser photo". Type the wavelengths. A check figure
+   shows which spots were found.
+   Choose "Prism" (curved fit, needs 3+ lines) or "Grating" (straight line).
+   "Estimate from known peaks..." fits a prism model to the absorption peaks
+   of samples whose lambda_max you know. It is NOT independent - report it
+   as approximate.
+
+5. MEASURE
+   Select sample photos and press "Measure selected photo(s)", or tick
+   "Measure new photos automatically" for live use.
+   Offset correction: use "No offset correction" for photos taken with fixed
+   (manual/Pro) exposure. "Auto offset" subtracts a constant so that the
+   most transparent part of each spectrum sits at zero; use it only for
+   automatic-exposure photos and mention it in your report.
+   The Notes column warns when a photo's exposure time or ISO differs from
+   the reference, or when the rainbow is overexposed. Such values are not
+   reliable.
+
+6. COMPARE AND SAVE
+   "Add lab spectrum (CSV)..." overlays laboratory UV-Vis spectra (shown
+   when the axis is in nm). UTF-16 instrument exports are read directly.
+   "Save settings..." stores the reference, strip, calibration and options;
+   "Load settings..." restores them next time.
+
+Taking good photos (most important part!)
+-----------------------------------------
+  - Phone in a clamp or on a tripod; tape the paper screen down.
+  - Use the camera's Pro / manual mode:
+      ISO fixed (100-200), shutter speed fixed, white balance fixed
+      (e.g. 5500 K), manual focus on the paper.
+    Choose the shutter speed so the brightest part of the REFERENCE rainbow
+    is bright but not white.
+  - Darken the room. Use paper without optical brighteners if possible.
+  - Order: dark (lamp blocked) -> reference -> samples -> reference again
+    -> laser spots.
+  - Samples: peak absorbance about 0.3-1. Darker samples (A > 1.5) let too
+    little light through for a phone camera.
+  - Save as JPG (MATLAB cannot read HEIC; on iPhone choose "Most Compatible").
+  - Copy ORIGINAL files from the phone; messaging apps resize and recompress.
+
+Optical tip: a narrow slit (two razor blades ~0.5-1 mm apart) where the beam
+is focused turns overlapping colour blobs into a sharp band and greatly
+improves resolution.
+
+Lab UV-Vis spectra
+------------------
+    uvvis_process('..\example_data\uvvis')
+or  uvvis_process                (choose files in a dialog)
+or  uvvis_process(files, 'Range', [400 750], 'Names', {'blue','yellow'})
+Crops 380-800 nm, smooths over the instrument lamp lines at 486/656 nm,
+subtracts the mean absorbance at 750-800 nm, normalises, plots and saves
+UVVis_processed.csv/.png.
+
+Script version
+--------------
+batch_example.m does everything without the app. Edit the SETTINGS block
+(folder, file names, laser photo and wavelengths, offset mode) and press Run.
+
+Troubleshooting
+---------------
+"No bright rainbow found"       reference too dark or wrong photo selected.
+"Strip falls outside photo"     phone moved a lot; draw the strip again or
+                                untick "Follow small phone movements".
+Negative absorbance             sample photo brighter than reference:
+                                different exposure (see Notes) - use fixed
+                                exposure or "Auto offset".
+Rainbow sideways in MATLAB      cannot happen here: the phone's rotation flag
+                                is applied automatically.
+Found fewer laser spots         spots too dim or outside the strip; draw a
+                                taller strip or photograph the spots brighter.
