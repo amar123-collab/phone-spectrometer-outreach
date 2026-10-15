@@ -8,13 +8,6 @@ authors:
   - family-names: Raj
     given-names: Amar
     affiliation: "Nanoscience Center, University of Jyväskylä"
-  # Add co-authors here (confirm names and order with the team before release)
-  # - family-names: Lunarila
-  #   given-names: Runar
-  # - family-names: Tiainen
-  #   given-names: Ville
-  # - family-names: Toppari
-  #   given-names: Jussi
-# After the Zenodo release, add:
+ 
 # doi: 10.5281/zenodo.XXXXXXX
-# and, after acceptance, a "preferred-citation" block for the article.
+
